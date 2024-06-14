@@ -1,5 +1,69 @@
 <script lang="ts" setup>
+	import { onMounted, ref } from "vue";
+	import gsap from "gsap";
+
 	import ResultsSvg from "./assets/results.svg";
+
+	const inputRef = ref(null);
+
+	const handleMouseUp = () => {
+		gsap.to(inputRef.value, {
+			scale: 1.05,
+			duration: 0.25,
+			ease: "power1.inOut"
+		});
+	};
+
+	const handleMouseDown = () => {
+		gsap.to(inputRef.value, {
+			scale: 0.95,
+			duration: 0.25,
+			ease: "power1.inOut"
+		});
+	};
+
+	const handleMouseEnter = (event: any) => {
+		gsap.to(inputRef.value, {
+			scale: 1.05,
+			background: "#FFF",
+			color: "#262e38",
+			duration: 0.25,
+			ease: "power1.inOut"
+		});
+	};
+
+	const handleMouseLeave = () => {
+		gsap.to(inputRef.value, {
+			scale: 1,
+			background: "#262e38",
+			color: "#969fad",
+			duration: 0.25,
+			ease: "power1.inOut"
+		});
+	};
+
+	const handleTouchStart = () => {
+		gsap.to(inputRef.value, {
+			scale: 0.95,
+			color: "#262e38",
+			duration: 0.25,
+			ease: "power1.inOut"
+		});
+	};
+
+	const handleTouchEnd = () => {
+		gsap.to(inputRef.value, {
+			scale: 1,
+			background: "#262e38",
+			color: "#969fad",
+			duration: 0.25,
+			ease: "power1.inOut"
+		});
+	};
+
+	onMounted(() => {
+		console.log(inputRef.value);
+	});
 </script>
 
 <template>
@@ -26,7 +90,18 @@
 			<form class="rating-card__rating-form rating-form">
 				<div class="rating-form__rating-input-wrapper">
 					<label class="visually-hidden" for="rating1">Rating 1</label>
-					<input class="rating-form__rating-input" type="button" value="1" />
+					<input
+						ref="inputRef"
+						class="rating-form__rating-input"
+						type="button"
+						value="1"
+						@mousedown="handleMouseDown"
+						@mouseenter="handleMouseEnter"
+						@mouseleave="handleMouseLeave"
+						@mouseup="handleMouseUp"
+						@touchend="handleTouchEnd"
+						@touchstart="handleTouchStart"
+					/>
 					<label class="visually-hidden" for="rating2">Rating 2</label>
 					<input class="rating-form__rating-input" type="button" value="2" />
 					<label class="visually-hidden" for="rating3">Rating 3</label>
