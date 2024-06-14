@@ -7,14 +7,13 @@
 		<div class="rating-card__content-rating">
 			<span class="rating-card__icon-wrapper">
 				<svg
+					class="rating-card__icon"
 					fill="none"
-					height="14"
-					viewBox="0 0 15 14"
-					width="15"
+					viewBox="0 0 17 16"
 					xmlns="http://www.w3.org/2000/svg"
 				>
 					<path
-						d="M7.88911 0.691623L9.54732 4.05114C9.641 4.2409 9.82205 4.37243 10.0315 4.40284L13.7388 4.94165C13.9811 4.97683 14.1824 5.14652 14.258 5.37936C14.3336 5.61219 14.2704 5.86775 14.095 6.03855L11.4119 8.65351C11.2602 8.80139 11.1914 9.01421 11.2268 9.22254L11.8601 12.9151C11.9014 13.1563 11.8022 13.4001 11.6042 13.5439C11.4062 13.6877 11.1437 13.7067 10.9271 13.5928L7.6107 11.8491C7.42328 11.7507 7.19952 11.7507 7.0121 11.8491L3.69566 13.5928C3.47905 13.7067 3.21657 13.6877 3.01857 13.5439C2.82057 13.4001 2.72139 13.1563 2.76272 12.9151L3.39604 9.22254C3.43183 9.01394 3.36257 8.80109 3.21087 8.65351L0.527756 6.03855C0.352386 5.86775 0.28922 5.61219 0.364829 5.37936C0.440438 5.14652 0.641701 4.97683 0.883961 4.94165L4.59132 4.40284C4.80075 4.37243 4.9818 4.2409 5.07548 4.05114L6.73369 0.691623C6.97159 0.213897 7.65314 0.213897 7.88911 0.691623Z"
+						d="M9.06688 0.429953L11.0567 4.46137C11.1691 4.68909 11.3864 4.84692 11.6377 4.88341L16.0866 5.52998C16.3773 5.5722 16.6188 5.77583 16.7095 6.05523C16.8002 6.33463 16.7244 6.64131 16.514 6.84627L13.2943 9.98421C13.1122 10.1617 13.0296 10.4171 13.0721 10.667L13.8321 15.0981C13.8816 15.3876 13.7626 15.6801 13.525 15.8527C13.2874 16.0253 12.9724 16.048 12.7125 15.9114L8.73279 13.8189C8.50789 13.7009 8.23937 13.7009 8.01447 13.8189L4.03475 15.9114C3.77481 16.048 3.45984 16.0253 3.22224 15.8527C2.98464 15.6801 2.86562 15.3876 2.91521 15.0981L3.6752 10.667C3.71815 10.4167 3.63503 10.1613 3.45299 9.98421L0.233258 6.84627C0.022814 6.64131 -0.0529846 6.33463 0.0377459 6.05523C0.128477 5.77583 0.369993 5.5722 0.660704 5.52998L5.10953 4.88341C5.36085 4.84692 5.57812 4.68909 5.69052 4.46137L7.68038 0.429953C7.96586 -0.143318 8.78372 -0.143318 9.06688 0.429953Z"
 						fill="#FC7614"
 					/>
 				</svg>
@@ -60,11 +59,20 @@
 		margin-right: 2.4rem;
 		max-width: 32.7rem;
 		overflow: hidden;
+
+		@media (width >= 768px) {
+			border-radius: 3rem;
+			max-width: 41.2rem;
+		}
 	}
 
 	.rating-card__content-rating {
 		padding: 2.4rem 2.4rem 3.2rem 2.4rem;
-		display: none;
+		display: block;
+
+		@media (width >= 768px) {
+			padding: 3.2rem;
+		}
 	}
 
 	.rating-card__icon-wrapper {
@@ -77,6 +85,22 @@
 		align-items: center;
 		justify-content: center;
 		margin-bottom: 1.6rem;
+
+		@media (width >= 768px) {
+			width: 4.8rem;
+			height: 4.8rem;
+			margin-bottom: 3rem;
+		}
+	}
+
+	.rating-card__icon {
+		width: 1.3rem;
+		height: 1.3rem;
+
+		@media (width >= 768px) {
+			width: 1.6rem;
+			height: 1.6rem;
+		}
 	}
 
 	.rating-card__title {
@@ -86,6 +110,11 @@
 		color: var(--pure-white);
 		text-align: left;
 		margin: 0 0 1.7rem 0;
+
+		@media (width >= 768px) {
+			font-size: 2.8rem;
+			margin: 0 0 0.7rem 0;
+		}
 	}
 
 	.rating-card__title--text-align--center {
@@ -100,6 +129,11 @@
 		color: var(--light-grey);
 		text-align: left;
 		margin: 0;
+
+		@media (width >= 768px) {
+			font-size: 1.5rem;
+			line-height: 160%;
+		}
 	}
 
 	.rating-card__text--text-align--center {
@@ -115,14 +149,17 @@
 		display: flex;
 		flex-direction: column;
 		row-gap: 2.4rem;
+
+		@media (width >= 768px) {
+			row-gap: 3.2rem;
+		}
 	}
 
 	.rating-form__rating-input-wrapper {
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		justify-content: center;
-		column-gap: 1.8rem;
+		justify-content: space-between;
 	}
 
 	.rating-form__rating-input {
@@ -139,6 +176,13 @@
 		color: var(--light-grey);
 		cursor: pointer;
 		border: none;
+
+		@media (width >= 768px) {
+			width: 5.1rem;
+			height: 5.1rem;
+			font-size: 1.6rem;
+			line-height: 150%;
+		}
 	}
 
 	.rating-form__rating-submit-button {
@@ -155,13 +199,21 @@
 		border: none;
 		cursor: pointer;
 		text-transform: uppercase;
+
+		@media (width >= 768px) {
+			font-size: 1.5rem;
+		}
 	}
 
 	.rating-card__content-rating-submitted {
 		padding: 3.4rem 2.4rem 3.7rem 2.4rem;
-		display: block;
+		display: none;
 		flex-direction: column;
 		align-items: center;
+
+		@media (width >= 768px) {
+			padding: 4.5rem 3.2rem 4.5rem 3.2rem;
+		}
 	}
 
 	.rating-card__image {
@@ -169,6 +221,12 @@
 		height: 9.6rem;
 		margin: 0 auto 2.4rem auto;
 		display: block;
+
+		@media (width >= 768px) {
+			width: 16.2rem;
+			height: 10.8rem;
+			margin: 0 auto 3.2rem auto;
+		}
 	}
 
 	.rating-card__rating-result {
@@ -182,5 +240,11 @@
 		color: var(--orange);
 		padding: 0.5rem 1.2rem;
 		margin: 0 0 2.4rem 0;
+
+		@media (width >= 768px) {
+			padding: 0.4rem 2rem;
+			font-size: 1.5rem;
+			line-height: 160%;
+		}
 	}
 </style>
