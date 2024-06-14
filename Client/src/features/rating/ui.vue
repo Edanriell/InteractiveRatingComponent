@@ -1,30 +1,30 @@
 <script lang="ts" setup>
-	import { onMounted, ref } from "vue";
+	import { ref } from "vue";
 	import gsap from "gsap";
 
 	import ResultsSvg from "./assets/results.svg";
 
-	const inputRef = ref(null);
+	const ratingValue = ref<number | null>(null);
 
-	const handleMouseUp = () => {
-		gsap.to(inputRef.value, {
-			scale: 1.05,
+	const handleMouseUp = (event: MouseEvent) => {
+		gsap.to(event.target, {
+			scale: 1.1,
 			duration: 0.25,
 			ease: "power1.inOut"
 		});
 	};
 
-	const handleMouseDown = () => {
-		gsap.to(inputRef.value, {
-			scale: 0.95,
+	const handleMouseDown = (event: MouseEvent) => {
+		gsap.to(event.target, {
+			scale: 0.9,
 			duration: 0.25,
 			ease: "power1.inOut"
 		});
 	};
 
-	const handleMouseEnter = (event: any) => {
-		gsap.to(inputRef.value, {
-			scale: 1.05,
+	const handleMouseEnter = (event: MouseEvent) => {
+		gsap.to(event.target, {
+			scale: 1.1,
 			background: "#FFF",
 			color: "#262e38",
 			duration: 0.25,
@@ -32,8 +32,8 @@
 		});
 	};
 
-	const handleMouseLeave = () => {
-		gsap.to(inputRef.value, {
+	const handleMouseLeave = (event: MouseEvent) => {
+		gsap.to(event.target, {
 			scale: 1,
 			background: "#262e38",
 			color: "#969fad",
@@ -42,17 +42,17 @@
 		});
 	};
 
-	const handleTouchStart = () => {
-		gsap.to(inputRef.value, {
-			scale: 0.95,
+	const handleTouchStart = (event: TouchEvent) => {
+		gsap.to(event.target, {
+			scale: 0.9,
 			color: "#262e38",
 			duration: 0.25,
 			ease: "power1.inOut"
 		});
 	};
 
-	const handleTouchEnd = () => {
-		gsap.to(inputRef.value, {
+	const handleTouchEnd = (event: TouchEvent) => {
+		gsap.to(event.target, {
 			scale: 1,
 			background: "#262e38",
 			color: "#969fad",
@@ -61,9 +61,10 @@
 		});
 	};
 
-	onMounted(() => {
-		console.log(inputRef.value);
-	});
+	const handleMouseClick = (rating: number) => {
+		ratingValue.value = rating;
+		console.log(ratingValue.value);
+	};
 </script>
 
 <template>
@@ -85,31 +86,25 @@
 			<h2 class="rating-card__title">How did we do?</h2>
 			<p class="rating-card__text">
 				Please let us know how we did with your support request. All feedback is appreciated to help
-				us improve our offering!
+				us improve our offering! {{ ratingValue }}
 			</p>
 			<form class="rating-card__rating-form rating-form">
 				<div class="rating-form__rating-input-wrapper">
-					<label class="visually-hidden" for="rating1">Rating 1</label>
-					<input
-						ref="inputRef"
-						class="rating-form__rating-input"
-						type="button"
-						value="1"
-						@mousedown="handleMouseDown"
-						@mouseenter="handleMouseEnter"
-						@mouseleave="handleMouseLeave"
-						@mouseup="handleMouseUp"
-						@touchend="handleTouchEnd"
-						@touchstart="handleTouchStart"
-					/>
-					<label class="visually-hidden" for="rating2">Rating 2</label>
-					<input class="rating-form__rating-input" type="button" value="2" />
-					<label class="visually-hidden" for="rating3">Rating 3</label>
-					<input class="rating-form__rating-input" type="button" value="3" />
-					<label class="visually-hidden" for="rating4">Rating 4</label>
-					<input class="rating-form__rating-input" type="button" value="4" />
-					<label class="visually-hidden" for="rating5">Rating 5</label>
-					<input class="rating-form__rating-input" type="button" value="5" />
+					<div v-for="rating in [1, 2, 3, 4, 5]" :key="rating">
+						<label class="visually-hidden" for="rating1">Rating {{ rating }}</label>
+						<input
+							:value="rating"
+							class="rating-form__rating-input"
+							type="button"
+							@click="handleMouseClick(rating)"
+							@mousedown="handleMouseDown"
+							@mouseenter="handleMouseEnter"
+							@mouseleave="handleMouseLeave"
+							@mouseup="handleMouseUp"
+							@touchend="handleTouchEnd"
+							@touchstart="handleTouchStart"
+						/>
+					</div>
 				</div>
 				<button class="rating-form__rating-submit-button" type="submit">Submit</button>
 			</form>
