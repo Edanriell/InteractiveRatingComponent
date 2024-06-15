@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 	import { onMounted, ref } from "vue";
 
+	import { Button } from "@shared/ui";
+
 	import {
 		handleInputMouseDown,
 		handleInputMouseEnter,
@@ -128,7 +130,7 @@
 						/>
 					</div>
 				</div>
-				<button class="rating-form__rating-submit-button" type="submit">Submit</button>
+				<Button type="submit">Submit</Button>
 			</form>
 		</div>
 		<div class="rating-card__content-rating-submitted">
@@ -274,26 +276,6 @@
 			height: 5.1rem;
 			font-size: 1.6rem;
 			line-height: 150%;
-		}
-	}
-
-	.rating-form__rating-submit-button {
-		width: 100%;
-		border-radius: 2.2rem;
-		background: var(--orange);
-		font-family: var(--font-family), sans-serif;
-		font-weight: 700;
-		font-size: 1.4rem;
-		letter-spacing: 0.13em;
-		color: var(--very-dark-blue);
-		padding-top: 1.4rem;
-		padding-bottom: 1.3rem;
-		border: none;
-		cursor: pointer;
-		text-transform: uppercase;
-
-		@media (width >= 768px) {
-			font-size: 1.5rem;
 		}
 	}
 
