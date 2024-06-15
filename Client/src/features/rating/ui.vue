@@ -4,6 +4,7 @@
 	import { Button } from "@shared/ui";
 
 	import {
+		displaySubmittedContent,
 		handleInputMouseDown,
 		handleInputMouseEnter,
 		handleInputMouseLeave,
@@ -21,6 +22,8 @@
 	let currentlySelectedInputIndex = ref<number | null>(null);
 
 	const formRef = ref<HTMLFormElement | null>(null);
+	const mainContentRef = ref<HTMLDivElement | null>(null);
+	const submittedContentRef = ref<HTMLDivElement | null>(null);
 
 	onMounted(() => {
 		const isRatingFormSubmitted = Boolean(localStorage.getItem("isRatingFormSubmitted"));
@@ -59,13 +62,19 @@
 
 		ratingFormState.value = "submitted";
 
+		displaySubmittedContent({
+			ratingFormState: ratingFormState.value,
+			mainContent: mainContentRef.value as HTMLDivElement,
+			submittedContent: submittedContentRef.value as HTMLDivElement
+		});
+
 		// localStorage.setItem("isRatingFormSubmitted", "true");
 	};
 </script>
 
 <template>
 	<article class="rating-card">
-		<div class="rating-card__content-rating">
+		<div ref="mainContentRef" class="rating-card__content-rating">
 			<span class="rating-card__icon-wrapper">
 				<svg
 					class="rating-card__icon"
@@ -133,7 +142,7 @@
 				<Button type="submit">Submit</Button>
 			</form>
 		</div>
-		<div class="rating-card__content-rating-submitted">
+		<div ref="submittedContentRef" class="rating-card__content-rating-submitted">
 			<img :src="ResultsSvg" alt="my-logo" class="rating-card__image" />
 			<p class="rating-card__rating-result">You selected 4 out of 5</p>
 			<h2 class="rating-card__title rating-card__title--text-align--center">Thank you!</h2>
@@ -153,6 +162,8 @@
 		margin-right: 2.4rem;
 		max-width: 32.7rem;
 		overflow: hidden;
+		display: flex;
+		flex-direction: row;
 
 		@media (width >= 768px) {
 			border-radius: 3rem;
@@ -163,9 +174,11 @@
 	.rating-card__content-rating {
 		padding: 2.4rem 2.4rem 3.2rem 2.4rem;
 		display: block;
+		flex: 0 0 32.7rem;
 
 		@media (width >= 768px) {
 			padding: 3.2rem;
+			flex: 0 0 41.2rem;
 		}
 	}
 
@@ -281,11 +294,13 @@
 
 	.rating-card__content-rating-submitted {
 		padding: 3.4rem 2.4rem 3.7rem 2.4rem;
-		display: none;
+		display: block;
 		flex-direction: column;
 		align-items: center;
+		flex: 0 0 32.7rem;
 
 		@media (width >= 768px) {
+			flex: 0 0 41.2rem;
 			padding: 4.5rem 3.2rem 4.5rem 3.2rem;
 		}
 	}

@@ -18,6 +18,12 @@ type handleInputParameters = {
 	selectedRatingValue: number | null;
 };
 
+type displaySubmittedContentParameters = {
+	ratingFormState: string;
+	mainContent: HTMLDivElement;
+	submittedContent: HTMLDivElement;
+};
+
 export const handleInputMouseUp = (event: MouseEvent) => {
 	gsap.to(event.target, {
 		scale: 1.1,
@@ -116,6 +122,26 @@ export const removeHighlightFromPreviouslySelectedInput = ({
 			background: "#262e38",
 			duration: 0.25,
 			ease: "power1.inOut"
+		});
+	}
+};
+
+export const displaySubmittedContent = ({
+	ratingFormState,
+	mainContent,
+	submittedContent
+}: displaySubmittedContentParameters) => {
+	if (ratingFormState === "submitted") {
+		gsap.to(mainContent, {
+			translateX: -412,
+			duration: 1,
+			ease: "back.inOut"
+		});
+
+		gsap.to(submittedContent, {
+			translateX: -412,
+			duration: 1,
+			ease: "back.inOut"
 		});
 	}
 };
