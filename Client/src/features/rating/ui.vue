@@ -1,12 +1,22 @@
 <script lang="ts" setup>
-	import { ref } from "vue";
+	import { onMounted, ref } from "vue";
 	import gsap from "gsap";
 
 	import ResultsSvg from "./assets/results.svg";
 
-	const ratingValue = ref<number | null>(null);
+	const selectedRatingValue = ref<number | null>(null);
+	const ratingFormState = ref<"invalid" | "valid" | "submitted">("invalid");
+	let currentlySelectedInputIndex = ref<number | null>(null);
 
-	const handleMouseUp = (event: MouseEvent) => {
+	const formRef = ref<HTMLFormElement | null>(null);
+
+	onMounted(() => {
+		const isRatingFormSubmitted = Boolean(localStorage.getItem("isRatingFormSubmitted"));
+
+		if (isRatingFormSubmitted) ratingFormState.value = "submitted";
+	});
+
+	const handleInputMouseUp = (event: MouseEvent) => {
 		gsap.to(event.target, {
 			scale: 1.1,
 			duration: 0.25,
@@ -14,7 +24,7 @@
 		});
 	};
 
-	const handleMouseDown = (event: MouseEvent) => {
+	const handleInputMouseDown = (event: MouseEvent) => {
 		gsap.to(event.target, {
 			scale: 0.9,
 			duration: 0.25,
@@ -22,48 +32,96 @@
 		});
 	};
 
-	const handleMouseEnter = (event: MouseEvent) => {
+	const handleInputMouseEnter = (event: MouseEvent, rating: number) => {
 		gsap.to(event.target, {
 			scale: 1.1,
-			background: "#FFF",
-			color: "#262e38",
+			background: selectedRatingValue.value === rating ? "#fc7614" : "#FFF",
+			color: selectedRatingValue.value === rating ? "#262e38" : "#262e38",
 			duration: 0.25,
 			ease: "power1.inOut"
 		});
 	};
 
-	const handleMouseLeave = (event: MouseEvent) => {
+	const handleInputMouseLeave = (event: MouseEvent, rating: number) => {
 		gsap.to(event.target, {
 			scale: 1,
-			background: "#262e38",
-			color: "#969fad",
+			background: selectedRatingValue.value === rating ? "#fc7614" : "#262e38",
+			color: selectedRatingValue.value === rating ? "#262e38" : "#969fad",
 			duration: 0.25,
 			ease: "power1.inOut"
 		});
 	};
 
-	const handleTouchStart = (event: TouchEvent) => {
+	const handleInputTouchStart = (event: TouchEvent, rating: number) => {
 		gsap.to(event.target, {
-			scale: 0.9,
-			color: "#262e38",
+			scale: 1.1,
+			background: selectedRatingValue.value === rating ? "#fc7614" : "#FFF",
+			color: selectedRatingValue.value === rating ? "#262e38" : "#262e38",
 			duration: 0.25,
 			ease: "power1.inOut"
 		});
 	};
 
-	const handleTouchEnd = (event: TouchEvent) => {
+	const handleInputTouchEnd = (event: TouchEvent, rating: number) => {
 		gsap.to(event.target, {
 			scale: 1,
-			background: "#262e38",
-			color: "#969fad",
+			background: selectedRatingValue.value === rating ? "#fc7614" : "#262e38",
+			color: selectedRatingValue.value === rating ? "#262e38" : "#969fad",
 			duration: 0.25,
 			ease: "power1.inOut"
 		});
 	};
 
-	const handleMouseClick = (rating: number) => {
-		ratingValue.value = rating;
-		console.log(ratingValue.value);
+	const handleInputMouseClick = (event: Event, inputValue: number, index: number) => {
+		selectedRatingValue.value = inputValue;
+
+		if (selectedRatingValue.value) {
+			ratingFormState.value = "valid";
+		} else {
+			return;
+		}
+
+		if (
+			currentlySelectedInputIndex.value !== null ||
+			Number(currentlySelectedInputIndex.value) !== inputValue
+		) {
+			gsap.to(
+				(formRef.value as unknown as HTMLFormElement).children[0].children[
+					Number(currentlySelectedInputIndex.value)
+				].children[1],
+				{
+					color: "#969fad",
+					background: "#262e38",
+					duration: 0.25,
+					ease: "power1.inOut"
+				}
+			);
+		}
+
+		if (selectedRatingValue.value === inputValue)
+			gsap.to(event.target, {
+				scale: 1.1,
+				color: "#262e38",
+				background: "#fc7614",
+				duration: 0.25,
+				ease: "power1.inOut"
+			});
+
+		currentlySelectedInputIndex.value = index;
+
+		// console.log(selectedRatingValue.value);
+
+		// console.log((formRef.value as unknown as HTMLFormElement).children[0].children[0].children[1]);
+	};
+
+	const handleFormSubmit = (event: Event) => {
+		event.preventDefault();
+
+		if (ratingFormState.value === "invalid") return;
+
+		ratingFormState.value = "submitted";
+
+		// localStorage.setItem("isRatingFormSubmitted", "true");
 	};
 </script>
 
@@ -86,23 +144,23 @@
 			<h2 class="rating-card__title">How did we do?</h2>
 			<p class="rating-card__text">
 				Please let us know how we did with your support request. All feedback is appreciated to help
-				us improve our offering! {{ ratingValue }}
+				us improve our offering! {{ selectedRatingValue }}
 			</p>
-			<form class="rating-card__rating-form rating-form">
+			<form ref="formRef" class="rating-card__rating-form rating-form" @submit="handleFormSubmit">
 				<div class="rating-form__rating-input-wrapper">
-					<div v-for="rating in [1, 2, 3, 4, 5]" :key="rating">
+					<div v-for="(rating, index) in [1, 2, 3, 4, 5]" :key="rating">
 						<label class="visually-hidden" for="rating1">Rating {{ rating }}</label>
 						<input
 							:value="rating"
 							class="rating-form__rating-input"
 							type="button"
-							@click="handleMouseClick(rating)"
-							@mousedown="handleMouseDown"
-							@mouseenter="handleMouseEnter"
-							@mouseleave="handleMouseLeave"
-							@mouseup="handleMouseUp"
-							@touchend="handleTouchEnd"
-							@touchstart="handleTouchStart"
+							@click="(event) => handleInputMouseClick(event, rating, index)"
+							@mousedown="handleInputMouseDown"
+							@mouseenter="(event) => handleInputMouseEnter(event, rating)"
+							@mouseleave="(event) => handleInputMouseLeave(event, rating)"
+							@mouseup="handleInputMouseUp"
+							@touchend="(event) => handleInputTouchEnd(event, rating)"
+							@touchstart="(event) => handleInputTouchStart(event, rating)"
 						/>
 					</div>
 				</div>
