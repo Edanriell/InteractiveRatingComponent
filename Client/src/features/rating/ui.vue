@@ -1,6 +1,16 @@
 <script lang="ts" setup>
 	import { onMounted, ref } from "vue";
-	import gsap from "gsap";
+
+	import {
+		handleInputMouseDown,
+		handleInputMouseEnter,
+		handleInputMouseLeave,
+		handleInputMouseUp,
+		handleInputTouchEnd,
+		handleInputTouchStart,
+		highlightSelectedInput,
+		removeHighlightFromPreviouslySelectedInput
+	} from "./model";
 
 	import ResultsSvg from "./assets/results.svg";
 
@@ -16,62 +26,6 @@
 		if (isRatingFormSubmitted) ratingFormState.value = "submitted";
 	});
 
-	const handleInputMouseUp = (event: MouseEvent) => {
-		gsap.to(event.target, {
-			scale: 1.1,
-			duration: 0.25,
-			ease: "power1.inOut"
-		});
-	};
-
-	const handleInputMouseDown = (event: MouseEvent) => {
-		gsap.to(event.target, {
-			scale: 0.9,
-			duration: 0.25,
-			ease: "power1.inOut"
-		});
-	};
-
-	const handleInputMouseEnter = (event: MouseEvent, rating: number) => {
-		gsap.to(event.target, {
-			scale: 1.1,
-			background: selectedRatingValue.value === rating ? "#fc7614" : "#FFF",
-			color: selectedRatingValue.value === rating ? "#262e38" : "#262e38",
-			duration: 0.25,
-			ease: "power1.inOut"
-		});
-	};
-
-	const handleInputMouseLeave = (event: MouseEvent, rating: number) => {
-		gsap.to(event.target, {
-			scale: 1,
-			background: selectedRatingValue.value === rating ? "#fc7614" : "#262e38",
-			color: selectedRatingValue.value === rating ? "#262e38" : "#969fad",
-			duration: 0.25,
-			ease: "power1.inOut"
-		});
-	};
-
-	const handleInputTouchStart = (event: TouchEvent, rating: number) => {
-		gsap.to(event.target, {
-			scale: 1.1,
-			background: selectedRatingValue.value === rating ? "#fc7614" : "#FFF",
-			color: selectedRatingValue.value === rating ? "#262e38" : "#262e38",
-			duration: 0.25,
-			ease: "power1.inOut"
-		});
-	};
-
-	const handleInputTouchEnd = (event: TouchEvent, rating: number) => {
-		gsap.to(event.target, {
-			scale: 1,
-			background: selectedRatingValue.value === rating ? "#fc7614" : "#262e38",
-			color: selectedRatingValue.value === rating ? "#262e38" : "#969fad",
-			duration: 0.25,
-			ease: "power1.inOut"
-		});
-	};
-
 	const handleInputMouseClick = (event: Event, inputValue: number, index: number) => {
 		selectedRatingValue.value = inputValue;
 
@@ -81,37 +35,19 @@
 			return;
 		}
 
-		if (
-			currentlySelectedInputIndex.value !== null ||
-			Number(currentlySelectedInputIndex.value) !== inputValue
-		) {
-			gsap.to(
-				(formRef.value as unknown as HTMLFormElement).children[0].children[
-					Number(currentlySelectedInputIndex.value)
-				].children[1],
-				{
-					color: "#969fad",
-					background: "#262e38",
-					duration: 0.25,
-					ease: "power1.inOut"
-				}
-			);
-		}
+		removeHighlightFromPreviouslySelectedInput({
+			currentlySelectedInputIndex: currentlySelectedInputIndex.value,
+			inputValue,
+			form: formRef.value as HTMLFormElement
+		});
 
-		if (selectedRatingValue.value === inputValue)
-			gsap.to(event.target, {
-				scale: 1.1,
-				color: "#262e38",
-				background: "#fc7614",
-				duration: 0.25,
-				ease: "power1.inOut"
-			});
+		highlightSelectedInput({
+			selectedRatingValue: selectedRatingValue.value,
+			inputValue,
+			input: event.target as HTMLInputElement
+		});
 
 		currentlySelectedInputIndex.value = index;
-
-		// console.log(selectedRatingValue.value);
-
-		// console.log((formRef.value as unknown as HTMLFormElement).children[0].children[0].children[1]);
 	};
 
 	const handleFormSubmit = (event: Event) => {
@@ -156,11 +92,39 @@
 							type="button"
 							@click="(event) => handleInputMouseClick(event, rating, index)"
 							@mousedown="handleInputMouseDown"
-							@mouseenter="(event) => handleInputMouseEnter(event, rating)"
-							@mouseleave="(event) => handleInputMouseLeave(event, rating)"
+							@mouseenter="
+								(event) =>
+									handleInputMouseEnter({
+										event,
+										rating,
+										selectedRatingValue: selectedRatingValue
+									})
+							"
+							@mouseleave="
+								(event) =>
+									handleInputMouseLeave({
+										event,
+										rating,
+										selectedRatingValue: selectedRatingValue
+									})
+							"
 							@mouseup="handleInputMouseUp"
-							@touchend="(event) => handleInputTouchEnd(event, rating)"
-							@touchstart="(event) => handleInputTouchStart(event, rating)"
+							@touchend="
+								(event) =>
+									handleInputTouchEnd({
+										event,
+										rating,
+										selectedRatingValue: selectedRatingValue
+									})
+							"
+							@touchstart="
+								(event) =>
+									handleInputTouchStart({
+										event,
+										rating,
+										selectedRatingValue: selectedRatingValue
+									})
+							"
 						/>
 					</div>
 				</div>
