@@ -2,6 +2,7 @@
 	import { onMounted, ref } from "vue";
 
 	import { Button } from "@shared/ui";
+	import { useWindowWidth } from "@shared/lib/hooks";
 
 	import {
 		displaySubmittedContent,
@@ -17,6 +18,8 @@
 
 	import ResultsSvg from "./assets/results.svg";
 
+	const { windowWidth } = useWindowWidth();
+
 	const selectedRatingValue = ref<number | null>(null);
 	const ratingFormState = ref<"invalid" | "valid" | "submitted">("invalid");
 	let currentlySelectedInputIndex = ref<number | null>(null);
@@ -26,6 +29,8 @@
 	const submittedContentRef = ref<HTMLDivElement | null>(null);
 
 	onMounted(() => {
+		console.log(windowWidth.value);
+
 		const isRatingFormSubmitted = Boolean(localStorage.getItem("isRatingFormSubmitted"));
 
 		if (isRatingFormSubmitted) ratingFormState.value = "submitted";
@@ -63,6 +68,7 @@
 		ratingFormState.value = "submitted";
 
 		displaySubmittedContent({
+			currentWindowWidth: windowWidth.value,
 			ratingFormState: ratingFormState.value,
 			mainContent: mainContentRef.value as HTMLDivElement,
 			submittedContent: submittedContentRef.value as HTMLDivElement
@@ -91,7 +97,7 @@
 			<h2 class="rating-card__title">How did we do?</h2>
 			<p class="rating-card__text">
 				Please let us know how we did with your support request. All feedback is appreciated to help
-				us improve our offering! {{ selectedRatingValue }}
+				us improve our offering!
 			</p>
 			<form ref="formRef" class="rating-card__rating-form rating-form" @submit="handleFormSubmit">
 				<div class="rating-form__rating-input-wrapper">
@@ -144,7 +150,7 @@
 		</div>
 		<div ref="submittedContentRef" class="rating-card__content-rating-submitted">
 			<img :src="ResultsSvg" alt="my-logo" class="rating-card__image" />
-			<p class="rating-card__rating-result">You selected 4 out of 5</p>
+			<p class="rating-card__rating-result">You selected {{ selectedRatingValue }} out of 5</p>
 			<h2 class="rating-card__title rating-card__title--text-align--center">Thank you!</h2>
 			<p class="rating-card__text rating-card__text--text-align--center">
 				We appreciate you taking the time to give a rating. If you ever need more support, don’t

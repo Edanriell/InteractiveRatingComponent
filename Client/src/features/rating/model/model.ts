@@ -22,6 +22,7 @@ type displaySubmittedContentParameters = {
 	ratingFormState: string;
 	mainContent: HTMLDivElement;
 	submittedContent: HTMLDivElement;
+	currentWindowWidth: number;
 };
 
 export const handleInputMouseUp = (event: MouseEvent) => {
@@ -129,17 +130,18 @@ export const removeHighlightFromPreviouslySelectedInput = ({
 export const displaySubmittedContent = ({
 	ratingFormState,
 	mainContent,
-	submittedContent
+	submittedContent,
+	currentWindowWidth
 }: displaySubmittedContentParameters) => {
 	if (ratingFormState === "submitted") {
 		gsap.to(mainContent, {
-			translateX: -412,
+			translateX: currentWindowWidth >= 768 ? -412 : -327,
 			duration: 1,
 			ease: "back.inOut"
 		});
 
 		gsap.to(submittedContent, {
-			translateX: -412,
+			translateX: currentWindowWidth >= 768 ? -412 : -327,
 			duration: 1,
 			ease: "back.inOut"
 		});
