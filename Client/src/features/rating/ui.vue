@@ -1,69 +1,63 @@
 <script lang="ts" setup>
-	import { ref } from "vue";
-	import gsap from "gsap";
+	import { onMounted, ref } from "vue";
+
+	import {
+		handleInputMouseDown,
+		handleInputMouseEnter,
+		handleInputMouseLeave,
+		handleInputMouseUp,
+		handleInputTouchEnd,
+		handleInputTouchStart,
+		highlightSelectedInput,
+		removeHighlightFromPreviouslySelectedInput
+	} from "./model";
 
 	import ResultsSvg from "./assets/results.svg";
 
-	const ratingValue = ref<number | null>(null);
+	const selectedRatingValue = ref<number | null>(null);
+	const ratingFormState = ref<"invalid" | "valid" | "submitted">("invalid");
+	let currentlySelectedInputIndex = ref<number | null>(null);
 
-	const handleMouseUp = (event: MouseEvent) => {
-		gsap.to(event.target, {
-			scale: 1.1,
-			duration: 0.25,
-			ease: "power1.inOut"
+	const formRef = ref<HTMLFormElement | null>(null);
+
+	onMounted(() => {
+		const isRatingFormSubmitted = Boolean(localStorage.getItem("isRatingFormSubmitted"));
+
+		if (isRatingFormSubmitted) ratingFormState.value = "submitted";
+	});
+
+	const handleInputMouseClick = (event: Event, inputValue: number, index: number) => {
+		selectedRatingValue.value = inputValue;
+
+		if (selectedRatingValue.value) {
+			ratingFormState.value = "valid";
+		} else {
+			return;
+		}
+
+		removeHighlightFromPreviouslySelectedInput({
+			currentlySelectedInputIndex: currentlySelectedInputIndex.value,
+			inputValue,
+			form: formRef.value as HTMLFormElement
 		});
+
+		highlightSelectedInput({
+			selectedRatingValue: selectedRatingValue.value,
+			inputValue,
+			input: event.target as HTMLInputElement
+		});
+
+		currentlySelectedInputIndex.value = index;
 	};
 
-	const handleMouseDown = (event: MouseEvent) => {
-		gsap.to(event.target, {
-			scale: 0.9,
-			duration: 0.25,
-			ease: "power1.inOut"
-		});
-	};
+	const handleFormSubmit = (event: Event) => {
+		event.preventDefault();
 
-	const handleMouseEnter = (event: MouseEvent) => {
-		gsap.to(event.target, {
-			scale: 1.1,
-			background: "#FFF",
-			color: "#262e38",
-			duration: 0.25,
-			ease: "power1.inOut"
-		});
-	};
+		if (ratingFormState.value === "invalid") return;
 
-	const handleMouseLeave = (event: MouseEvent) => {
-		gsap.to(event.target, {
-			scale: 1,
-			background: "#262e38",
-			color: "#969fad",
-			duration: 0.25,
-			ease: "power1.inOut"
-		});
-	};
+		ratingFormState.value = "submitted";
 
-	const handleTouchStart = (event: TouchEvent) => {
-		gsap.to(event.target, {
-			scale: 0.9,
-			color: "#262e38",
-			duration: 0.25,
-			ease: "power1.inOut"
-		});
-	};
-
-	const handleTouchEnd = (event: TouchEvent) => {
-		gsap.to(event.target, {
-			scale: 1,
-			background: "#262e38",
-			color: "#969fad",
-			duration: 0.25,
-			ease: "power1.inOut"
-		});
-	};
-
-	const handleMouseClick = (rating: number) => {
-		ratingValue.value = rating;
-		console.log(ratingValue.value);
+		// localStorage.setItem("isRatingFormSubmitted", "true");
 	};
 </script>
 
@@ -86,23 +80,51 @@
 			<h2 class="rating-card__title">How did we do?</h2>
 			<p class="rating-card__text">
 				Please let us know how we did with your support request. All feedback is appreciated to help
-				us improve our offering! {{ ratingValue }}
+				us improve our offering! {{ selectedRatingValue }}
 			</p>
-			<form class="rating-card__rating-form rating-form">
+			<form ref="formRef" class="rating-card__rating-form rating-form" @submit="handleFormSubmit">
 				<div class="rating-form__rating-input-wrapper">
-					<div v-for="rating in [1, 2, 3, 4, 5]" :key="rating">
+					<div v-for="(rating, index) in [1, 2, 3, 4, 5]" :key="rating">
 						<label class="visually-hidden" for="rating1">Rating {{ rating }}</label>
 						<input
 							:value="rating"
 							class="rating-form__rating-input"
 							type="button"
-							@click="handleMouseClick(rating)"
-							@mousedown="handleMouseDown"
-							@mouseenter="handleMouseEnter"
-							@mouseleave="handleMouseLeave"
-							@mouseup="handleMouseUp"
-							@touchend="handleTouchEnd"
-							@touchstart="handleTouchStart"
+							@click="(event) => handleInputMouseClick(event, rating, index)"
+							@mousedown="handleInputMouseDown"
+							@mouseenter="
+								(event) =>
+									handleInputMouseEnter({
+										event,
+										rating,
+										selectedRatingValue: selectedRatingValue
+									})
+							"
+							@mouseleave="
+								(event) =>
+									handleInputMouseLeave({
+										event,
+										rating,
+										selectedRatingValue: selectedRatingValue
+									})
+							"
+							@mouseup="handleInputMouseUp"
+							@touchend="
+								(event) =>
+									handleInputTouchEnd({
+										event,
+										rating,
+										selectedRatingValue: selectedRatingValue
+									})
+							"
+							@touchstart="
+								(event) =>
+									handleInputTouchStart({
+										event,
+										rating,
+										selectedRatingValue: selectedRatingValue
+									})
+							"
 						/>
 					</div>
 				</div>
