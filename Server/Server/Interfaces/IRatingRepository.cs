@@ -1,6 +1,8 @@
+using Server.Dto;
+
 namespace Server.Interfaces;
 
 public interface IRatingRepository
 {
-    Task<IResult> CreateNewRating(byte ratingValue);
+    Task<IResult> CreateNewRating(CreateNewRatingRequestDto request);
 }

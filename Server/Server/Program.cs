@@ -6,6 +6,15 @@ using Server.Routing;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173", "https://localhost:5173").AllowAnyMethod().AllowAnyHeader();
+        });
+});
+
 // Adding services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>();
 builder.Services.AddScoped<IRatingRepository, RatingRepository>();
@@ -22,6 +31,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowLocalhost");
 
 app.MapEndpoints(Assembly.GetExecutingAssembly());
 
