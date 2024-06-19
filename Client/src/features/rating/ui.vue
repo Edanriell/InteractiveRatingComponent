@@ -4,6 +4,7 @@
 	import { Button } from "@shared/ui";
 	import { useWindowWidth } from "@shared/lib/hooks";
 
+	import { createNewRating } from "@features/rating/api";
 	import {
 		displaySubmittedContent,
 		handleInputMouseDown,
@@ -20,9 +21,10 @@
 
 	const { windowWidth } = useWindowWidth();
 
+	const isRatingSuccessfullySubmitted = ref<boolean | null>(null);
 	const selectedRatingValue = ref<number | null>(null);
 	const ratingFormState = ref<"invalid" | "valid" | "submitted">("invalid");
-	let currentlySelectedInputIndex = ref<number | null>(null);
+	const currentlySelectedInputIndex = ref<number | null>(null);
 
 	const formRef = ref<HTMLFormElement | null>(null);
 	const mainContentRef = ref<HTMLDivElement | null>(null);
@@ -60,7 +62,7 @@
 		currentlySelectedInputIndex.value = index;
 	};
 
-	const handleFormSubmit = (event: Event) => {
+	const handleFormSubmit = async (event: Event) => {
 		event.preventDefault();
 
 		if (ratingFormState.value === "invalid") return;
@@ -74,6 +76,16 @@
 			submittedContent: submittedContentRef.value as HTMLDivElement
 		});
 
+		try {
+			const ratingSubmissionResult = await createNewRating({
+				value: selectedRatingValue.value as number
+			});
+			isRatingSuccessfullySubmitted.value = !!ratingSubmissionResult.message;
+		} catch {
+			isRatingSuccessfullySubmitted.value = false;
+		}
+
+		console.log(isRatingSuccessfullySubmitted.value);
 		// localStorage.setItem("isRatingFormSubmitted", "true");
 	};
 </script>
