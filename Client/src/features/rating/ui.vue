@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 	import { onMounted, ref } from "vue";
+	import { useToast } from "primevue/usetoast";
 
 	import { Button } from "@shared/ui";
 	import { useWindowWidth } from "@shared/lib/hooks";
@@ -20,6 +21,7 @@
 	import ResultsSvg from "./assets/results.svg";
 
 	const { windowWidth } = useWindowWidth();
+	const toast = useToast();
 
 	const isRatingSuccessfullySubmitted = ref<boolean | null>(null);
 	const selectedRatingValue = ref<number | null>(null);
@@ -65,9 +67,20 @@
 	const handleFormSubmit = async (event: Event) => {
 		event.preventDefault();
 
-		if (ratingFormState.value === "invalid") return;
+		if (ratingFormState.value === "invalid") {
+			toast.add({
+				severity: "error",
+				summary: "Error while submitting rating",
+				detail: "Please select one of the rating values",
+				life: 5400,
+				closable: false
+			});
+			return;
+		}
 
 		ratingFormState.value = "submitted";
+
+		toast.removeAllGroups();
 
 		displaySubmittedContent({
 			currentWindowWidth: windowWidth.value,
