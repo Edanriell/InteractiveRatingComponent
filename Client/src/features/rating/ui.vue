@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 	import { onMounted, ref } from "vue";
 	import { useToast } from "primevue/usetoast";
+	import ProgressSpinner from "primevue/progressspinner";
 
 	import { Button } from "@shared/ui";
 	import { useWindowWidth } from "@shared/lib/hooks";
@@ -23,7 +24,7 @@
 	const { windowWidth } = useWindowWidth();
 	const toast = useToast();
 
-	const isRatingSuccessfullySubmitted = ref<boolean | null>(null);
+	const isRatingSuccessfullySubmitted = ref<"idle" | "pending" | "success" | "failure">("idle");
 	const selectedRatingValue = ref<number | null>(null);
 	const ratingFormState = ref<"invalid" | "valid" | "submitted">("invalid");
 	const currentlySelectedInputIndex = ref<number | null>(null);
@@ -90,15 +91,18 @@
 		});
 
 		try {
+			isRatingSuccessfullySubmitted.value = "pending";
 			const ratingSubmissionResult = await createNewRating({
 				value: selectedRatingValue.value as number
 			});
-			isRatingSuccessfullySubmitted.value = !!ratingSubmissionResult.message;
-		} catch {
-			isRatingSuccessfullySubmitted.value = false;
+			if (ratingSubmissionResult.message) {
+				isRatingSuccessfullySubmitted.value = "success";
+			}
+		} catch (error) {
+			isRatingSuccessfullySubmitted.value = "failure";
+			console.error(error);
 		}
 
-		console.log(isRatingSuccessfullySubmitted.value);
 		// localStorage.setItem("isRatingFormSubmitted", "true");
 	};
 </script>
@@ -176,8 +180,43 @@
 		<div ref="submittedContentRef" class="rating-card__content-rating-submitted">
 			<img :src="ResultsSvg" alt="my-logo" class="rating-card__image" />
 			<p class="rating-card__rating-result">You selected {{ selectedRatingValue }} out of 5</p>
-			<h2 class="rating-card__title rating-card__title--text-align--center">Thank you!</h2>
-			<p class="rating-card__text rating-card__text--text-align--center">
+			<h2
+				v-if="isRatingSuccessfullySubmitted === 'pending'"
+				class="rating-card__title rating-card__title--text-align--center"
+			>
+				Sending your data
+			</h2>
+			<h2
+				v-else-if="isRatingSuccessfullySubmitted === 'failure'"
+				class="rating-card__title rating-card__title--text-align--center"
+			>
+				Sorry
+			</h2>
+			<h2
+				v-else-if="isRatingSuccessfullySubmitted === 'success'"
+				class="rating-card__title rating-card__title--text-align--center"
+			>
+				Thank you!
+			</h2>
+			<div v-if="isRatingSuccessfullySubmitted === 'pending'" class="spinner-container">
+				<ProgressSpinner
+					animationDuration=".5s"
+					aria-label="ProgressSpinner"
+					fill="transparent"
+					strokeWidth="8"
+					style="width: 50px; height: 50px; margin-top: 24px"
+				/>
+			</div>
+			<p
+				v-if="isRatingSuccessfullySubmitted === 'failure'"
+				class="rating-card__text rating-card__text--text-align--center"
+			>
+				Could not submit your rating data to server. Try again later.
+			</p>
+			<p
+				v-else-if="isRatingSuccessfullySubmitted === 'success'"
+				class="rating-card__text rating-card__text--text-align--center"
+			>
 				We appreciate you taking the time to give a rating. If you ever need more support, don’t
 				hesitate to get in touch!
 			</p>
@@ -366,5 +405,10 @@
 			font-size: 1.5rem;
 			line-height: 160%;
 		}
+	}
+
+	.spinner-container {
+		display: flex;
+		align-items: center;
 	}
 </style>
