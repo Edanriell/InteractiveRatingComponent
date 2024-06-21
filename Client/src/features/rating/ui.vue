@@ -34,11 +34,22 @@
 	const submittedContentRef = ref<HTMLDivElement | null>(null);
 
 	onMounted(() => {
-		console.log(windowWidth.value);
+		if (!localStorage.getItem("formSubmissionResult")) return;
 
-		const isRatingFormSubmitted = Boolean(localStorage.getItem("isRatingFormSubmitted"));
+		const formSubmissionResult = JSON.parse(localStorage.getItem("formSubmissionResult")!);
 
-		if (isRatingFormSubmitted) ratingFormState.value = "submitted";
+		if (formSubmissionResult.result === "success") {
+			ratingFormState.value = "submitted";
+			isRatingSuccessfullySubmitted.value = "success";
+			selectedRatingValue.value = formSubmissionResult.value;
+
+			displaySubmittedContent({
+				currentWindowWidth: windowWidth.value,
+				ratingFormState: ratingFormState.value,
+				mainContent: mainContentRef.value as HTMLDivElement,
+				submittedContent: submittedContentRef.value as HTMLDivElement
+			});
+		}
 	});
 
 	const handleInputMouseClick = (event: Event, inputValue: number, index: number) => {
@@ -65,14 +76,14 @@
 		currentlySelectedInputIndex.value = index;
 	};
 
-	const handleFormSubmit = async (event: Event) => {
+	const handleRatingFormSubmit = async (event: Event) => {
 		event.preventDefault();
 
 		if (ratingFormState.value === "invalid") {
 			toast.add({
 				severity: "error",
 				summary: "Error while submitting rating",
-				detail: "Please select one of the rating values",
+				detail: "Please select and submit one of the available rating values",
 				life: 5400,
 				closable: false
 			});
@@ -101,9 +112,16 @@
 		} catch (error) {
 			isRatingSuccessfullySubmitted.value = "failure";
 			console.error(error);
+			return;
 		}
 
-		// localStorage.setItem("isRatingFormSubmitted", "true");
+		localStorage.setItem(
+			"formSubmissionResult",
+			JSON.stringify({
+				result: isRatingSuccessfullySubmitted.value,
+				value: selectedRatingValue.value
+			})
+		);
 	};
 </script>
 
@@ -128,7 +146,11 @@
 				Please let us know how we did with your support request. All feedback is appreciated to help
 				us improve our offering!
 			</p>
-			<form ref="formRef" class="rating-card__rating-form rating-form" @submit="handleFormSubmit">
+			<form
+				ref="formRef"
+				class="rating-card__rating-form rating-form"
+				@submit="handleRatingFormSubmit"
+			>
 				<div class="rating-form__rating-input-wrapper">
 					<div v-for="(rating, index) in [1, 2, 3, 4, 5]" :key="rating">
 						<label class="visually-hidden" for="rating1">Rating {{ rating }}</label>
