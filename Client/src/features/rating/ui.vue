@@ -233,7 +233,7 @@
 				v-if="isRatingSuccessfullySubmitted === 'failure'"
 				class="rating-card__text rating-card__text--text-align--center"
 			>
-				Could not submit your rating data to server. Try again later.
+				Could not submit your rating data to server. Please try again later.
 			</p>
 			<p
 				v-else-if="isRatingSuccessfullySubmitted === 'success'"
